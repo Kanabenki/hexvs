@@ -1,0 +1,135 @@
+[gd_scene load_steps=14 format=2]
+
+[ext_resource path="res://game/MainCamera.tscn" type="PackedScene" id=1]
+[ext_resource path="res://game/background-border.shader" type="Shader" id=2]
+[ext_resource path="res://game/player/Trail.tscn" type="PackedScene" id=3]
+[ext_resource path="res://game/death-border.shader" type="Shader" id=4]
+[ext_resource path="res://game/DeathBorder.gd" type="Script" id=5]
+[ext_resource path="res://game/player/Player.tscn" type="PackedScene" id=6]
+[ext_resource path="res://game/player/Player2.tscn" type="PackedScene" id=7]
+[ext_resource path="res://game/Debug.gd" type="Script" id=8]
+[ext_resource path="res://game/wall/Wall.tscn" type="PackedScene" id=9]
+[ext_resource path="res://game/gui/GUI.tscn" type="PackedScene" id=10]
+
+[sub_resource type="ShaderMaterial" id=1]
+
+shader = ExtResource( 2 )
+shader_param/speed = 2.0
+shader_param/min_red = 0.3
+shader_param/max_red = 0.7
+
+[sub_resource type="ShaderMaterial" id=2]
+
+shader = ExtResource( 4 )
+shader_param/fill_perc = 0.0
+shader_param/speed = 2.0
+shader_param/min_red = 0.3
+shader_param/max_red = 0.7
+
+[sub_resource type="RectangleShape2D" id=3]
+
+extents = Vector2( 960, 10 )
+
+[node name="Game" type="Node"]
+
+[node name="MainCamera" parent="." instance=ExtResource( 1 )]
+p1_path = NodePath("../Players/Player1")
+p2_path = NodePath("../Players/Player2")
+
+[node name="Effects" type="Node" parent="."]
+
+[node name="BackgroundBorder" type="ColorRect" parent="Effects"]
+material = SubResource( 1 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -899.0
+margin_top = -850.0
+margin_right = 891.0
+margin_bottom = 790.0
+rect_pivot_offset = Vector2( 160, 1390 )
+color = Color( 0, 0, 0, 1 )
+
+[node name="Background" type="ColorRect" parent="Effects"]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.0745098, 0.0627451, 0.192157, 1 )
+
+[node name="Trail1P1" parent="Effects" instance=ExtResource( 3 )]
+target_path = NodePath("../../Players/Player1")
+
+[node name="Trail2P1" parent="Effects" instance=ExtResource( 3 )]
+target_path = NodePath("../../Players/Player1")
+OFFSET = -50
+
+[node name="Trail1P2" parent="Effects" instance=ExtResource( 3 )]
+target_path = NodePath("../../Players/Player2")
+
+[node name="Trail2P2" parent="Effects" instance=ExtResource( 3 )]
+target_path = NodePath("../../Players/Player2")
+OFFSET = -50
+
+[node name="DeathBorder" type="ColorRect" parent="Effects"]
+light_mask = 0
+material = SubResource( 2 )
+anchor_right = 1.0
+anchor_bottom = 1.0
+rect_pivot_offset = Vector2( 160, 1390 )
+color = Color( 0, 0, 0, 1 )
+script = ExtResource( 5 )
+
+[node name="Players" type="Node" parent="."]
+
+[node name="Player1" parent="Players" instance=ExtResource( 6 )]
+position = Vector2( 384, 540 )
+
+[node name="Player2" parent="Players" instance=ExtResource( 7 )]
+position = Vector2( 1536, 540 )
+rotation = 3.14159
+
+[node name="Debug" type="Label" parent="."]
+visible = false
+margin_left = 240.0
+margin_top = 163.0
+margin_right = 1820.0
+margin_bottom = 311.0
+custom_colors/font_color = Color( 1, 1, 1, 1 )
+script = ExtResource( 8 )
+
+[node name="Walls" type="Node" parent="."]
+
+[node name="Wall" parent="Walls" instance=ExtResource( 9 )]
+
+[node name="Wall2" parent="Walls" instance=ExtResource( 9 )]
+editor/display_folded = true
+position = Vector2( 0, 1080 )
+pos = 3
+
+[node name="WallCollider" parent="Walls/Wall2" index="0"]
+position = Vector2( 960, 0 )
+shape = SubResource( 3 )
+
+[node name="Wall3" parent="Walls" instance=ExtResource( 9 )]
+editor/display_folded = true
+position = Vector2( 1920, 0 )
+pos = 1
+
+[node name="Wall4" parent="Walls" instance=ExtResource( 9 )]
+editor/display_folded = true
+pos = 2
+
+[node name="WallCollider" parent="Walls/Wall4" index="0"]
+position = Vector2( 960, 0 )
+shape = SubResource( 3 )
+
+[node name="GUILayer" type="CanvasLayer" parent="."]
+
+[node name="GUI" parent="GUILayer" instance=ExtResource( 10 )]
+
+[connection signal="player_died" from="Players/Player1" to="MainCamera" method="_on_Player_player_died"]
+[connection signal="player_died" from="Players/Player2" to="MainCamera" method="_on_Player_player_died"]
+
+[editable path="Walls/Wall2"]
+
+[editable path="Walls/Wall3"]
+
+[editable path="Walls/Wall4"]
